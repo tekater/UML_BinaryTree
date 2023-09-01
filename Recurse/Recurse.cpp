@@ -81,7 +81,7 @@ int main()
     elevator(n);
 
     cout << "\nВведите число для Факториала:\n"; cin >> n;
-    cout << "Факториал числа "  <<  n << ": " << Factorial(n) << endl; // Done
+    cout << "Факториал "  <<  n << ": " << Factorial(n) << endl; // Done
 
     cout << "\nВведите число для Возведения в степень:\n"; cin >> d;
     cout << "Введите Степень:\n"; cin >> i;
