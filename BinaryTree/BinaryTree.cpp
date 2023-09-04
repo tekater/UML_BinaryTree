@@ -23,11 +23,11 @@ protected:
 		Element(int Data, Element* pLeft = nullptr, Element* pRight = nullptr)
 			: Data(Data), pLeft(pLeft), pRight(pRight)
 		{
-			//cout << "EC.";
+			cout << "EC.";
 			//cout << "EConstructor: \t" << this << endl;
 		}
 		~Element() {
-			//cout << "ED.";
+			cout << "ED.";
 			//cout << "EDestrcutor: \t" << this << endl;
 		}
 		friend class Tree;
@@ -142,6 +142,7 @@ private:
 		else {
 			return Min(Root->pLeft);
 		}*/
+
 		PMIN++;
 		return Root->pLeft == nullptr ? Root->Data : Min(Root->pLeft);
 
@@ -243,6 +244,7 @@ private:
 
 #define BASE_CHECK
 //#define DEPTH_CHECK
+
 int main()
 {
 	setlocale(0, "");
@@ -253,13 +255,13 @@ int main()
 	Tree tree;
 	clock_t start = clock();
 	//cout << "Введите размер дерева: "; cin >> n;
-	n = 200000;
+	n = 500;
 
 	for (int i = 0; i < n; i++) {
 		tree.Insert(rand() % 100);
 	}
 	clock_t end = clock();
-	cout << "Дерево заполнено за " << double(end - start) / CLOCKS_PER_SEC << " сек.\n";
+	cout << "\n\nДерево заполнено за " << double(end - start) / CLOCKS_PER_SEC << " сек.\n";
 	
 	//tree.Print();
 
@@ -333,6 +335,7 @@ int main()
 	cout << utree.Avg() << endl << endl;
 	cout << utree.Depth() << endl;*/
 
+	cout << "\n\n";
 	start = clock();
 	min = utree.Min();
 	end = clock();
@@ -370,6 +373,10 @@ int main()
 
 	
 #endif // BASE_CHECK
+
+
+
+
 
 #ifdef DEPTH_CHECK
 
