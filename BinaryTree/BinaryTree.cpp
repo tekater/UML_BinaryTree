@@ -6,12 +6,13 @@ using std::cin;
 using std::cout;
 using std::endl;
 
-int PSUM = 0;
-int PMAX = 0;
-int PMIN = 0;
-int PAVG = 0;
-int PCOUNT = 0;
-int PDEPTH = 0;
+int pSum = 0;
+int pMax = 0;
+int pMin = 0;
+int pAvg = 0;
+int pCount = 0;
+int pDepth = 0;
+
 
 class Tree {
 protected:
@@ -23,11 +24,15 @@ protected:
 		Element(int Data, Element* pLeft = nullptr, Element* pRight = nullptr)
 			: Data(Data), pLeft(pLeft), pRight(pRight)
 		{
+#ifdef Construct
 			cout << "EC.";
+#endif // Construct
 			//cout << "EConstructor: \t" << this << endl;
 		}
 		~Element() {
+#ifdef Construct
 			cout << "ED.";
+#endif // Construct
 			//cout << "EDestrcutor: \t" << this << endl;
 		}
 		friend class Tree;
@@ -39,7 +44,9 @@ public:
 		return Root;
 	}
 	Tree() :Root(nullptr) {
+#ifdef Construct
 		cout << "TC.\n";
+#endif // Construct
 		//cout << "TConstructor:\t" << this << endl;
 	}
 	Tree(const std::initializer_list<int>& il) : Tree() {
@@ -48,7 +55,9 @@ public:
 		}
 	}
 	~Tree() {
+#ifdef Construct
 		cout << "TD.\n";
+#endif // Construct
 		//cout << "TDestructor:\t" << this << endl;
 		Clear();
 	}
@@ -67,35 +76,43 @@ public:
 		Root = nullptr;
 	}
 
-	int Depth() {
-		cout << "Depth: ";
+	int Depth()const {
+		cout << "Depth:\t";
 		return Depth(Root);
 	}
 
 	int Sum()const {
-		cout << "Sum: ";
+		cout << "Sum:\t";
 		return Sum(Root);
 	}
 
 	int Min()const {
-		cout << "Min: ";
+		cout << "Min:\t";
 		return Min(Root);
 	}
 	int Max()const {
-		cout << "Max: ";
+		cout << "Max:\t";
 		return Max(Root);
 	}
 	int Count()const {
-		cout << "Count: ";
+		cout << "Count:\t";
 		return Count(Root);
 	}
 
-	double Avg() {
-		PAVG++;
-		cout << "AVG: ";
+	double Avg()const {
+		pAvg++;
+		cout << "AVG:\t";
 		return Root == nullptr ? 0 : (double)Sum(Root) / Count(Root);
 	}
-	
+	void erase(int Data) {
+		erase(Data,Root);
+	}
+
+#ifdef OLD_PREFORMANCE_CHECK
+	void time() {
+		time(Root);
+	}
+#endif OLD_PREFORMANCE_CHECK
 private:
 
 	void Insert(int Data, Element* Root) {
@@ -143,7 +160,7 @@ private:
 			return Min(Root->pLeft);
 		}*/
 
-		PMIN++;
+		pMin++;
 		return Root->pLeft == nullptr ? Root->Data : Min(Root->pLeft);
 
 	}
@@ -160,7 +177,7 @@ private:
 			return Max(Root->pRight);
 		}*/
 
-		PMAX++;
+		pMax++;
 		return Root->pRight == nullptr ? Root->Data : Max(Root->pRight);
 	}
 
@@ -182,7 +199,7 @@ private:
 			Depth(Root->pRight) + 1 : Depth(Root->pLeft) + 1;
 	}*/
 
-	int Depth(Element* Root) {
+	int Depth(Element* Root)const {
 		if (Root == nullptr) {
 			return 0;
 		}
@@ -190,21 +207,132 @@ private:
 		int l_depth = Depth(Root->pLeft) + 1;
 		int r_depth = Depth(Root->pRight) + 1;
 
-		PDEPTH++;
+		pDepth++;
 
 		return l_depth < r_depth ? r_depth : l_depth;
 	}
 	
 	int Sum(Element* Root, int sum = 0)const {
-		PSUM++;
+		pSum++;
 		return Root == nullptr ? 0 : Sum(Root->pLeft) + Sum(Root->pRight) + Root->Data;
 	}
 
 	int Count(Element* Root)const {
-		PCOUNT++;
+		pCount++;
 		return Root == nullptr ? 0 : Count(Root->pLeft) + Count(Root->pRight) + 1;
 	}
 
+	void erase(int Data, Element*& Root) {
+		if (Root == nullptr) {
+			return;
+		}
+		erase(Data, Root->pLeft);
+		erase(Data, Root->pRight);
+
+		if (Data == Root->Data) {
+			if (Root->pLeft == Root->pRight) {
+				delete Root;
+				Root = nullptr;
+			}
+			else {
+				if (Count(Root->pLeft) > Count(Root->pRight)) {
+					Root->Data = Max(Root->pLeft);
+					erase(Max(Root->pLeft), Root->pLeft);
+				}
+				else {
+					Root->Data = Min(Root->pRight);
+					erase(Min(Root->pRight), Root->pRight);
+				}
+			}
+		}
+	}
+
+#ifdef OLD_PREFORMANCE_CHECK
+	void time(Element* Root) {
+		clock_t start = clock();
+		clock_t end = clock();
+		start = clock();
+		int min; int max;
+		int depth; int avg;
+		int sum; int count;
+		cout << "\nТаймер:\n[1] - Min\n[2] - Max\n[3] - Sum\n";
+		cout << "[4] - Count\n[5] - Avg\n[6] - Depth\n[7] - All\n";
+		int action; cin >> action;
+		switch (action) {
+		case 1:
+			start = clock();
+			min = Min();
+			end = clock();
+			cout << min << ", вычислено за " << double(end - start) / CLOCKS_PER_SEC << " секунд.\n";
+			break;
+		case 2:
+			start = clock();
+			max = Max();
+			end = clock();
+			cout << max << ", вычислено за " << double(end - start) / CLOCKS_PER_SEC << " секунд.\n";
+			break;
+		case 3:
+			start = clock();
+			sum = Sum();
+			end = clock();
+			cout << sum << ", вычислено за " << double(end - start) / CLOCKS_PER_SEC << " секунд.\n";
+			break;
+		case 4:
+			start = clock();
+			count = Count();
+			end = clock();
+			cout << count << ", вычислено за " << double(end - start) / CLOCKS_PER_SEC << " секунд.\n";
+			break;
+		case 5:
+			start = clock();
+			avg = Avg();
+			end = clock();
+			cout << avg << ", вычислено за " << double(end - start) / CLOCKS_PER_SEC << " секунд.\n";
+			cout << "\n";
+			break;
+		case 6:
+			start = clock();
+			depth = Depth();
+			end = clock();
+			cout << depth << ", вычислено за " << double(end - start) / CLOCKS_PER_SEC << " секунд.\n\n";
+			break;
+		default:
+			start = clock();
+			min = Min();
+			end = clock();
+			cout << min << ", вычислено за " << double(end - start) / CLOCKS_PER_SEC << " секунд.\n";
+
+			start = clock();
+			max = Max();
+			end = clock();
+			cout << max << ", вычислено за " << double(end - start) / CLOCKS_PER_SEC << " секунд.\n";
+			cout << "\n";
+
+			start = clock();
+			sum = Sum();
+			end = clock();
+			cout << sum << ", вычислено за " << double(end - start) / CLOCKS_PER_SEC << " секунд.\n";
+
+			start = clock();
+			count = Count();
+			end = clock();
+			cout << count <<", вычислено за " << double(end - start) / CLOCKS_PER_SEC << " секунд.\n";
+
+			start = clock();
+			avg = Avg();
+			end = clock();
+			cout << avg << ", вычислено за " << double(end - start) / CLOCKS_PER_SEC << " секунд.\n";
+			cout << "\n";
+
+			start = clock();
+			depth = Depth();
+			end = clock();
+			cout << depth << ", вычислено за " << double(end - start) / CLOCKS_PER_SEC << " секунд.\n\n";
+			break;
+		}
+		cout << "\n\n";
+	}
+#endif // OLD_PREFORMANCE_CHECK
 };
 
 class UniqueTree :public Tree {
@@ -242,8 +370,18 @@ private:
 	}
 };
 
+template<typename T>
+void measure(const Tree& tree, T(Tree::* member_function)()const) {
+	clock_t start = clock();
+	T value = (tree.*member_function)();
+	clock_t end = clock();
+	cout << value << "\t" << " выполнено за " << double(end - start) / CLOCKS_PER_SEC << " секунд.\n";
+}
+
 #define BASE_CHECK
-//#define DEPTH_CHECK
+#define DEPTH_CHECK
+//#define OLD_PREFORMANCE_CHECK
+//#define Construct
 
 int main()
 {
@@ -251,142 +389,83 @@ int main()
 
 #ifdef BASE_CHECK
 
+	cout << "============================ Tree ============================\n";
 	int n;
 	Tree tree;
-	clock_t start = clock();
+
 	//cout << "Введите размер дерева: "; cin >> n;
 	n = 500;
 
+	clock_t start = clock();
 	for (int i = 0; i < n; i++) {
 		tree.Insert(rand() % 100);
 	}
 	clock_t end = clock();
 	cout << "\n\nДерево заполнено за " << double(end - start) / CLOCKS_PER_SEC << " сек.\n";
-	
-	//tree.Print();
 
-	start = clock();
-	int min = tree.Min();
-	end = clock();
-	cout << min << "\t" << ", вычислено за " << double(end - start) / CLOCKS_PER_SEC << " секунд.\n";
-	
-	start = clock();
-	int max = tree.Max();
-	end = clock();
-	cout << max << "\t" << ", вычислено за " << double(end - start) / CLOCKS_PER_SEC << " секунд.\n";
-	cout << "\n";
+	tree.Print();
 
-	start = clock();
-	int sum = tree.Sum();
-	end = clock();
-	cout << sum << "\t" << ", вычислено за " << double(end - start) / CLOCKS_PER_SEC << " секунд.\n";
 
-	start = clock();
-	int count = tree.Count();
-	end = clock();
-	cout << count << "\t" << ", вычислено за " << double(end - start) / CLOCKS_PER_SEC << " секунд.\n";
+#ifdef OLD_PREFORMANCE_CHECKDEBUG
+	tree.time();
+#endif // OLD_PREFORMANCE_CHECKDEBUG
 
-	start = clock();
-	double avg = tree.Avg();
-	end = clock();
-	cout << avg << "\t" << ", вычислено за " << double(end - start) / CLOCKS_PER_SEC << " секунд.\n";
-	cout << "\n";
 
-	start = clock();
-	int depth = tree.Depth();
-	end = clock();
-	cout << depth << "\t" << ", вычислено за " << double(end - start) / CLOCKS_PER_SEC << " секунд.\n\n";
+	//measure("Минимальное значение в дереве: ", tree,&Tree::Min);
+	measure(tree, &Tree::Min);
+	measure(tree, &Tree::Max);
+	measure(tree, &Tree::Sum);
+	measure(tree, &Tree::Avg);
+	measure(tree, &Tree::Count);
+	measure(tree, &Tree::Depth);
 
-	/*cout << tree.Min() << endl;
-	cout << tree.Max() << endl << endl;
 
-	
-	cout << tree.Sum() << endl;
-	cout << tree.Count() << endl;
-
-	cout << tree.Avg() << endl << endl;;
-	cout << tree.Depth() << endl;*/
 
 	tree.Clear();
 	//tree.Print();
 	cout << "\n\n";
 
 	cout << "~Счётчик запуска:";
-	cout << "\nMAX: " << PMAX << "\nMIN: " << PMIN;
-	cout << "\nCOUNT: " << PCOUNT << "\nSUM: " << PSUM;
-	cout << "\nAVG: " << PAVG << "\nDEPTH: " << PDEPTH << "\n\n\n";
+	cout << "\nMAX: " << pMax << "\nMIN: " << pMin;
+	cout << "\nCOUNT: " << pCount << "\nSUM: " << pSum;
+	cout << "\nAVG: " << pAvg << "\nDEPTH: " << pDepth << "\n\n\n";
 
 
-	cout << "UniqTree:\n";
+
+	cout << "========================= UniqTree ============================\n";
 	UniqueTree utree;
 
 	for (int i = 0; i < n; i++) {
 		utree.Insert(rand() % 100);
 	}
 
-	//utree.Print();
+	utree.Print();
 
-	/*cout << utree.Min() << endl;
-	cout << utree.Max() << endl << endl;
+#ifdef OLD_PREFORMANCE_CHECKDEBUG
+	utree.time();
+#endif // OLD_PREFORMANCE_CHECKDEBUG
 
-	cout << utree.Sum() << endl;
-	cout << utree.Count() << endl;
-
-	cout << utree.Avg() << endl << endl;
-	cout << utree.Depth() << endl;*/
-
-	cout << "\n\n";
-	start = clock();
-	min = utree.Min();
-	end = clock();
-	cout << min << "\t" << ", вычислено за " << double(end - start) / CLOCKS_PER_SEC << " секунд.\n";
-
-	start = clock();
-	max = utree.Max();
-	end = clock();
-	cout << max << "\t" << ", вычислено за " << double(end - start) / CLOCKS_PER_SEC << " секунд.\n";
-	cout << "\n";
-
-
-	start = clock();
-	sum = utree.Sum();
-	end = clock();
-	cout << sum << "\t" << ", вычислено за " << double(end - start) / CLOCKS_PER_SEC << " секунд.\n";
-
-	start = clock();
-	count = utree.Count();
-	end = clock();
-	cout << count << "\t" << ", вычислено за " << double(end - start) / CLOCKS_PER_SEC << " секунд.\n";
-
-	start = clock();
-	avg = utree.Avg();
-	end = clock();
-	cout << avg << "\t" << ", вычислено за " << double(end - start) / CLOCKS_PER_SEC << " секунд.\n";
-	cout << "\n";
-
-
-	start = clock();
-	depth = utree.Depth();
-	end = clock();
-	cout << depth << "\t" << ", вычислено за " << double(end - start) / CLOCKS_PER_SEC << " секунд.\n\n";
-
-
-	
 #endif // BASE_CHECK
 
 
 
-
-
 #ifdef DEPTH_CHECK
+	cout << "========================= DepthCheckTree ============================\n";
 
 	Tree tree3 = { 50,25,75,16,32,64,90,28 };
 	tree3.Print();
 
-	cout << tree3.Depth() << endl;
+	//cout << tree3.Depth();
+	measure(tree3, &Tree::Depth);
 
+	int value = 50;
+
+	//cout << "Введите удаляемое значение: "; cin >> value;
+	tree3.erase(value);
+
+	tree3.Print();
 #endif // DEPTH_CHECK
 
-	
+
 
 }
