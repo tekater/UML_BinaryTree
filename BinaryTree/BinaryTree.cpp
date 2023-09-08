@@ -76,9 +76,9 @@ public:
 		Root = nullptr;
 	}
 
-	int Depth()const {
-		cout << "Depth:\t";
-		return Depth(Root);
+	int depth()const {
+		//cout << "Depth:\t";
+		return depth(Root);
 	}
 
 	int Sum()const {
@@ -105,9 +105,19 @@ public:
 		return Root == nullptr ? 0 : (double)Sum(Root) / Count(Root);
 	}
 	void erase(int Data) {
-		erase(Data,Root);
+		erase(Data, Root);
 	}
-
+	void depth_print(int depth)const {
+		cout << "Depth Print:\n";
+		depth_print(Root, depth,64);
+	}
+	void tree_Print()const {
+		cout << "Tree Print\n";
+		tree_Print(Root,64);
+	}
+	void balance() {
+		balance(Root);
+	}
 #ifdef OLD_PREFORMANCE_CHECK
 	void time() {
 		time(Root);
@@ -199,19 +209,19 @@ private:
 			Depth(Root->pRight) + 1 : Depth(Root->pLeft) + 1;
 	}*/
 
-	int Depth(Element* Root)const {
+	int depth(Element* Root)const {
 		if (Root == nullptr) {
 			return 0;
 		}
 
-		int l_depth = Depth(Root->pLeft) + 1;
-		int r_depth = Depth(Root->pRight) + 1;
+		int l_depth = depth(Root->pLeft) + 1;
+		int r_depth = depth(Root->pRight) + 1;
 
 		pDepth++;
 
 		return l_depth < r_depth ? r_depth : l_depth;
 	}
-	
+
 	int Sum(Element* Root, int sum = 0)const {
 		pSum++;
 		return Root == nullptr ? 0 : Sum(Root->pLeft) + Sum(Root->pRight) + Root->Data;
@@ -246,6 +256,72 @@ private:
 			}
 		}
 	}
+
+	void depth_print(Element* Root, int depth, int width) const {
+		if (Root == nullptr) {
+			if (depth == 0) {
+				cout.width(width * 2); cout << " ";
+			}
+			return;
+		}
+
+		if (depth == 0) {
+			cout.width(width);
+			cout << Root->Data; 
+			cout.width(width); cout << " ";
+		}
+
+		depth_print(Root->pLeft, depth - 1, width);
+		depth_print(Root->pRight, depth - 1, width);
+	}
+
+	void tree_Print(Element* Root, int width, int depth = 0)const {
+		if (depth >= this->depth() || Root == nullptr) {
+			return;
+		}
+
+		depth_print(Root, depth, width);
+
+		cout << endl << endl << endl;
+
+		tree_Print(Root, width / 2, depth + 1);
+
+	}
+
+	void balance(Element* Root) {
+		if (Root == nullptr) {
+			return;
+		}
+
+		if (abs(Count(Root->pLeft) - Count(Root->pRight)) < 2) {
+			return;
+		}
+
+		if (Count(Root->pLeft) < Count(Root->pRight)) {
+			if (Root->pLeft) {
+				Insert(Root->Data, Root->pLeft);
+			}
+			else {
+				Root->pLeft = new Element(Root->Data);
+			}
+			Root->Data = Min(Root->pRight);
+			erase(Min(Root->pRight), Root->pRight);
+		}
+		else {
+			if (Root->pRight) {
+				Insert(Root->Data, Root->pRight);
+			}
+			else {
+				Root->pRight = new Element(Root->Data);
+			}
+			Root->Data = Max(Root->pLeft);
+			erase(Max(Root->pLeft), Root->pLeft);
+		}
+		balance(Root->pLeft);
+		balance(Root->pRight);
+		balance(Root);
+	}
+	
 
 #ifdef OLD_PREFORMANCE_CHECK
 	void time(Element* Root) {
@@ -378,10 +454,11 @@ void measure(const Tree& tree, T(Tree::* member_function)()const) {
 	cout << value << "\t" << " выполнено за " << double(end - start) / CLOCKS_PER_SEC << " секунд.\n";
 }
 
-#define BASE_CHECK
-#define DEPTH_CHECK
+//#define BASE_CHECK
+//#define DEPTH_CHECK
 //#define OLD_PREFORMANCE_CHECK
 //#define Construct
+#define BALANCE_CHECK
 
 int main()
 {
@@ -417,7 +494,7 @@ int main()
 	measure(tree, &Tree::Sum);
 	measure(tree, &Tree::Avg);
 	measure(tree, &Tree::Count);
-	measure(tree, &Tree::Depth);
+	cout << "Depth:\t"; measure(tree, &Tree::Depth);
 
 
 
@@ -452,19 +529,31 @@ int main()
 #ifdef DEPTH_CHECK
 	cout << "========================= DepthCheckTree ============================\n";
 
-	Tree tree3 = { 50,25,75,16,32,64,90,28 };
+	Tree tree3 = { 50,25,75,16,32,64,90,28,29 };
 	tree3.Print();
 
 	//cout << tree3.Depth();
-	measure(tree3, &Tree::Depth);
+	measure(tree3, &Tree::depth);
 
 	int value = 50;
 
 	//cout << "Введите удаляемое значение: "; cin >> value;
-	tree3.erase(value);
+	//tree3.erase(value);
 
 	tree3.Print();
+	int d = 0; //cout << "Введите глубину дерева:\n";cin >> d;
+
+	//tree3.depth_print(d);
+
+	tree3.tree_print();
 #endif // DEPTH_CHECK
+
+#ifdef BALANCE_CHECK 
+	Tree tree = { 89,55,34,21,8,5,3};
+	tree.tree_Print();
+	tree.balance();
+	tree.tree_Print();
+#endif // BALANCE_CHECK
 
 
 
