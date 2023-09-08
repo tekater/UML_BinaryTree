@@ -549,12 +549,10 @@ int main()
 #endif // DEPTH_CHECK
 
 #ifdef BALANCE_CHECK 
-	Tree tree = { 89,55,34,31,21,8,5,3};
+	Tree tree = { 89,55,34,21,8,5,3};
 	tree.tree_Print();
 	tree.balance();
 	tree.tree_Print();
-
-
 #endif // BALANCE_CHECK
 
 
