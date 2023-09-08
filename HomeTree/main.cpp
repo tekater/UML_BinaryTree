@@ -6,12 +6,13 @@ using std::cin;
 using std::cout;
 using std::endl;
 
-int PSUM = 0;
-int PMAX = 0;
-int PMIN = 0;
-int PAVG = 0;
-int PCOUNT = 0;
-int PDEPTH = 0;
+int pSum = 0;
+int pMax = 0;
+int pMin = 0;
+int pAvg = 0;
+int pCount = 0;
+int pDepth = 0;
+
 
 class Tree {
 protected:
@@ -23,11 +24,15 @@ protected:
 		Element(int Data, Element* pLeft = nullptr, Element* pRight = nullptr)
 			: Data(Data), pLeft(pLeft), pRight(pRight)
 		{
+#ifdef Construct
 			cout << "EC.";
+#endif // Construct
 			//cout << "EConstructor: \t" << this << endl;
 		}
 		~Element() {
+#ifdef Construct
 			cout << "ED.";
+#endif // Construct
 			//cout << "EDestrcutor: \t" << this << endl;
 		}
 		friend class Tree;
@@ -39,7 +44,9 @@ public:
 		return Root;
 	}
 	Tree() :Root(nullptr) {
+#ifdef Construct
 		cout << "TC.\n";
+#endif // Construct
 		//cout << "TConstructor:\t" << this << endl;
 	}
 	Tree(const std::initializer_list<int>& il) : Tree() {
@@ -48,7 +55,9 @@ public:
 		}
 	}
 	~Tree() {
+#ifdef Construct
 		cout << "TD.\n";
+#endif // Construct
 		//cout << "TDestructor:\t" << this << endl;
 		Clear();
 	}
@@ -67,37 +76,50 @@ public:
 		Root = nullptr;
 	}
 
-	int Depth() {
-		cout << "Depth: ";
-		return Depth(Root);
+	int depth()const {
+		//cout << "Depth:\t";
+		return depth(Root);
 	}
 
 	int Sum()const {
-		cout << "Sum: ";
+		cout << "Sum:\t";
 		return Sum(Root);
 	}
 
 	int Min()const {
-		cout << "Min: ";
+		cout << "Min:\t";
 		return Min(Root);
 	}
 	int Max()const {
-		cout << "Max: ";
+		cout << "Max:\t";
 		return Max(Root);
 	}
 	int Count()const {
-		cout << "Count: ";
+		cout << "Count:\t";
 		return Count(Root);
 	}
 
-	double Avg() {
-		PAVG++;
-		cout << "AVG: ";
+	double Avg()const {
+		pAvg++;
+		cout << "AVG:\t";
 		return Root == nullptr ? 0 : (double)Sum(Root) / Count(Root);
 	}
+	void erase(int Data) {
+		erase(Data, Root);
+	}
+	void depth_print(int depth)const {
+		cout << "Depth Print:\n";
+		depth_print(Root, depth);
+	}
+	void tree_print()const {
+		cout << "Tree Print\n";
+		tree_print(Root);
+	}
+#ifdef OLD_PREFORMANCE_CHECK
 	void time() {
 		time(Root);
 	}
+#endif OLD_PREFORMANCE_CHECK
 private:
 
 	void Insert(int Data, Element* Root) {
@@ -145,7 +167,7 @@ private:
 			return Min(Root->pLeft);
 		}*/
 
-		PMIN++;
+		pMin++;
 		return Root->pLeft == nullptr ? Root->Data : Min(Root->pLeft);
 
 	}
@@ -162,7 +184,7 @@ private:
 			return Max(Root->pRight);
 		}*/
 
-		PMAX++;
+		pMax++;
 		return Root->pRight == nullptr ? Root->Data : Max(Root->pRight);
 	}
 
@@ -184,29 +206,82 @@ private:
 			Depth(Root->pRight) + 1 : Depth(Root->pLeft) + 1;
 	}*/
 
-	int Depth(Element* Root) {
+	int depth(Element* Root)const {
 		if (Root == nullptr) {
 			return 0;
 		}
 
-		int l_depth = Depth(Root->pLeft) + 1;
-		int r_depth = Depth(Root->pRight) + 1;
+		int l_depth = depth(Root->pLeft) + 1;
+		int r_depth = depth(Root->pRight) + 1;
 
-		PDEPTH++;
+		pDepth++;
 
 		return l_depth < r_depth ? r_depth : l_depth;
 	}
-	
+
 	int Sum(Element* Root, int sum = 0)const {
-		PSUM++;
+		pSum++;
 		return Root == nullptr ? 0 : Sum(Root->pLeft) + Sum(Root->pRight) + Root->Data;
 	}
 
 	int Count(Element* Root)const {
-		PCOUNT++;
+		pCount++;
 		return Root == nullptr ? 0 : Count(Root->pLeft) + Count(Root->pRight) + 1;
 	}
 
+	void erase(int Data, Element*& Root) {
+		if (Root == nullptr) {
+			return;
+		}
+		erase(Data, Root->pLeft);
+		erase(Data, Root->pRight);
+
+		if (Data == Root->Data) {
+			if (Root->pLeft == Root->pRight) {
+				delete Root;
+				Root = nullptr;
+			}
+			else {
+				if (Count(Root->pLeft) > Count(Root->pRight)) {
+					Root->Data = Max(Root->pLeft);
+					erase(Max(Root->pLeft), Root->pLeft);
+				}
+				else {
+					Root->Data = Min(Root->pRight);
+					erase(Min(Root->pRight), Root->pRight);
+				}
+			}
+		}
+	}
+
+	void depth_print(Element* Root, int depth) const {
+		if (Root == nullptr) {
+			return;
+		}
+
+		if (depth == 0) {
+			cout << Root->Data << "\t";
+		}
+
+		depth_print(Root->pLeft, depth - 1);
+		depth_print(Root->pRight, depth - 1);
+	}
+
+	void tree_print(Element* Root, int depth = 0)const {
+		if (depth >= this->depth() || Root == nullptr) {
+			return;
+		}
+
+		//cout << Root->Data << "\t";
+
+		depth_print(Root, depth);
+
+		cout << endl;
+
+		tree_print(Root, depth + 1);
+		
+	}
+#ifdef OLD_PREFORMANCE_CHECK
 	void time(Element* Root) {
 		clock_t start = clock();
 		clock_t end = clock();
@@ -289,10 +364,9 @@ private:
 			cout << depth << ", вычислено за " << double(end - start) / CLOCKS_PER_SEC << " секунд.\n\n";
 			break;
 		}
-
-
 		cout << "\n\n";
 	}
+#endif // OLD_PREFORMANCE_CHECK
 };
 
 class UniqueTree :public Tree {
@@ -330,8 +404,18 @@ private:
 	}
 };
 
-#define BASE_CHECK
-//#define DEPTH_CHECK
+template<typename T>
+void measure(const Tree& tree, T(Tree::* member_function)()const) {
+	clock_t start = clock();
+	T value = (tree.*member_function)();
+	clock_t end = clock();
+	cout << value << "\t" << " выполнено за " << double(end - start) / CLOCKS_PER_SEC << " секунд.\n";
+}
+
+//#define BASE_CHECK
+#define DEPTH_CHECK
+//#define OLD_PREFORMANCE_CHECK
+//#define Construct
 
 int main()
 {
@@ -339,79 +423,88 @@ int main()
 
 #ifdef BASE_CHECK
 
+	cout << "============================ Tree ============================\n";
 	int n;
 	Tree tree;
-	clock_t start = clock();
+
 	//cout << "Введите размер дерева: "; cin >> n;
 	n = 500;
 
+	clock_t start = clock();
 	for (int i = 0; i < n; i++) {
 		tree.Insert(rand() % 100);
 	}
 	clock_t end = clock();
 	cout << "\n\nДерево заполнено за " << double(end - start) / CLOCKS_PER_SEC << " сек.\n";
-	
-	//tree.Print();
 
-	
-	/*cout << tree.Min() << endl;
-	cout << tree.Max() << endl << endl;
+	tree.Print();
 
-	
-	cout << tree.Sum() << endl;
-	cout << tree.Count() << endl;
 
-	cout << tree.Avg() << endl << endl;;
-	cout << tree.Depth() << endl;*/
+#ifdef OLD_PREFORMANCE_CHECKDEBUG
 	tree.time();
+#endif // OLD_PREFORMANCE_CHECKDEBUG
+
+
+	//measure("Минимальное значение в дереве: ", tree,&Tree::Min);
+	measure(tree, &Tree::Min);
+	measure(tree, &Tree::Max);
+	measure(tree, &Tree::Sum);
+	measure(tree, &Tree::Avg);
+	measure(tree, &Tree::Count);
+	cout << "Depth:\t"; measure(tree, &Tree::Depth);
+
+
 
 	tree.Clear();
 	//tree.Print();
 	cout << "\n\n";
 
 	cout << "~Счётчик запуска:";
-	cout << "\nMAX: " << PMAX << "\nMIN: " << PMIN;
-	cout << "\nCOUNT: " << PCOUNT << "\nSUM: " << PSUM;
-	cout << "\nAVG: " << PAVG << "\nDEPTH: " << PDEPTH << "\n\n\n";
+	cout << "\nMAX: " << pMax << "\nMIN: " << pMin;
+	cout << "\nCOUNT: " << pCount << "\nSUM: " << pSum;
+	cout << "\nAVG: " << pAvg << "\nDEPTH: " << pDepth << "\n\n\n";
 
 
-	cout << "UniqTree:\n";
+
+	cout << "========================= UniqTree ============================\n";
 	UniqueTree utree;
 
 	for (int i = 0; i < n; i++) {
 		utree.Insert(rand() % 100);
 	}
-	
-	//utree.Print();
 
-	/*cout << utree.Min() << endl;
-	cout << utree.Max() << endl << endl;
+	utree.Print();
 
-	cout << utree.Sum() << endl;
-	cout << utree.Count() << endl;
-
-	cout << utree.Avg() << endl << endl;
-	cout << utree.Depth() << endl;*/
-
+#ifdef OLD_PREFORMANCE_CHECKDEBUG
 	utree.time();
+#endif // OLD_PREFORMANCE_CHECKDEBUG
 
-
-	
 #endif // BASE_CHECK
 
 
 
-
-
 #ifdef DEPTH_CHECK
+	cout << "========================= DepthCheckTree ============================\n";
 
-	Tree tree3 = { 50,25,75,16,32,64,90,28 };
+	Tree tree3 = { 50,25,75,16,32,64,90,28,29 };
 	tree3.Print();
 
-	cout << tree3.Depth() << endl;
+	//cout << tree3.Depth();
+	measure(tree3, &Tree::depth);
 
+	int value = 50;
+
+	//cout << "Введите удаляемое значение: "; cin >> value;
+	//tree3.erase(value);
+
+	tree3.Print();
+	int d = 0; //cout << "Введите глубину дерева:\n";cin >> d;
+
+	//tree3.depth_print(d);
+	
+	tree3.tree_print();
 #endif // DEPTH_CHECK
 
-	
+
 
 }
