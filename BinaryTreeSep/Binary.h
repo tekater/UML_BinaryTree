@@ -7,12 +7,15 @@ using std::cin;
 using std::cout;
 using std::endl;
 
-int pSum = 0;
-int pMax = 0;
-int pMin = 0;
-int pAvg = 0;
-int pCount = 0;
-int pDepth = 0;
+//int pSum = 0;
+//int pMax = 0;
+//int pMin = 0;
+//int pAvg = 0;
+//int pCount = 0;
+//int pDepth = 0;
+
+template<class T> class Tree;
+template<typename T> void measure(Tree<T>* tree, T(Tree<T>::* function)());
 
 template<typename T>
 class Tree {
@@ -22,14 +25,8 @@ protected:
 		Element* pLeft;
 		Element* pRight;
 	public:
-		Element(T Data, Element* pLeft = nullptr, Element* pRight = nullptr)
-			: Data(Data), pLeft(pLeft), pRight(pRight)
-		{
-			cout << "EConstructor: \t" << this << endl;
-		}
-		~Element() {
-			cout << "EDestrcutor: \t" << this << endl;
-		}
+		Element(T Data, Element* pLeft = nullptr, Element* pRight = nullptr);
+		~Element();
 		friend class Tree;
 		friend class UniqueTree;
 	}*Root;
@@ -40,61 +37,24 @@ public:
 	Tree(const std::initializer_list<int>& il);
 	~Tree();
 
-	void Insert(int Data) {
-		Insert(Data, Root);
-	}
+	void Insert(T Data);
 
-	void Print() const {
-		cout << "\n\nPrint:\n";
-		Print(Root);
-		cout << endl << endl;
-	}
-	void Clear() {
-		Clear(Root);
-		Root = nullptr;
-	}
+	void Print() const;
+	void Clear();
 
-	int depth()const {
-		return depth(Root);
-	}
+	int depth()const;
 
-	int Sum()const {
-		cout << "Sum:\t";
-		return Sum(Root);
-	}
+	int Sum()const;
 
-	int Min()const {
-		cout << "Min:\t";
-		return Min(Root);
-	}
-	int Max()const {
-		cout << "Max:\t";
-		return Max(Root);
-	}
-	int Count()const {
-		cout << "Count:\t";
-		return Count(Root);
-	}
+	int Min()const;
+	int Max()const;
+	int Count()const;
 
-	double Avg()const {
-		pAvg++;
-		cout << "AVG:\t";
-		return Root == nullptr ? 0 : (double)Sum(Root) / Count(Root);
-	}
-	void erase(int Data) {
-		erase(Data, Root);
-	}
-	void depth_print(int depth)const {
-		cout << "Depth Print:\n";
-		depth_print(Root, depth, 64);
-	}
-	void tree_Print()const {
-		cout << "Tree Print\n";
-		tree_Print(Root, 64);
-	}
-	void balance() {
-		balance(Root);
-	}
+	double Avg()const;
+	void erase(T Data);
+	void depth_print(int depth)const;
+	void tree_Print()const;
+	void balance();
 private:
 
 	void Insert(T Data, Element* Root);
@@ -106,15 +66,6 @@ private:
 	int Max(Element* Root)const;
 
 	void Clear(Element* Root);
-
-	/*int Depth(Element* Root) {
-		if (Root == nullptr) {
-			return 0;
-		}
-		PDEPTH++;
-		return Depth(Root->pLeft) + 1 < Depth(Root->pRight) + 1 ?
-			Depth(Root->pRight) + 1 : Depth(Root->pLeft) + 1;
-	}*/
 
 	int depth(Element* Root)const;
 
@@ -129,4 +80,6 @@ private:
 	void tree_Print(Element* Root, int width, int depth = 0)const;
 
 	void balance(Element* Root);
+
+	friend class Element;
 };
