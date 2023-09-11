@@ -54,18 +54,18 @@ int main()
 
 
 
-	cout << "========================= UniqTree ============================\n";
-	UniqueTree utree;
-
-	for (int i = 0; i < n; i++) {
-		utree.Insert(rand() % 100);
-	}
-
-	utree.Print();
-
-#ifdef OLD_PREFORMANCE_CHECKDEBUG
-	utree.time();
-#endif // OLD_PREFORMANCE_CHECKDEBUG
+//	cout << "========================= UniqTree ============================\n";
+//	UniqueTree utree;
+//
+//	for (int i = 0; i < n; i++) {
+//		utree.Insert(rand() % 100);
+//	}
+//
+//	utree.Print();
+//
+//#ifdef OLD_PREFORMANCE_CHECKDEBUG
+//	utree.time();
+//#endif // OLD_PREFORMANCE_CHECKDEBUG
 
 #endif // BASE_CHECK
 
