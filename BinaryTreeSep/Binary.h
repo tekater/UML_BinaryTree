@@ -130,39 +130,3 @@ private:
 
 	void balance(Element* Root);
 };
-
-
-class UniqueTree :public Tree {
-public:
-	void Insert(int Data) {
-		Insert(Data, Root);
-	}
-private:
-	void Insert(int Data, Tree::Element* Root) {
-
-		if (this->Root == nullptr) {
-			this->Root = new Element(Data);
-		}
-
-		if (Root == nullptr) {
-			return;
-		}
-
-		if (Data < Root->Data) {
-			if (Root->pLeft == nullptr) {
-				Root->pLeft = new Element(Data);
-			}
-			else {
-				Insert(Data, Root->pLeft);
-			}
-		}
-		else if (Data > Root->Data) {
-			if (Root->pRight == nullptr) {
-				Root->pRight = new Element(Data);
-			}
-			else {
-				Insert(Data, Root->pRight);
-			}
-		}
-	}
-};
