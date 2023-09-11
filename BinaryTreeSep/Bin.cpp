@@ -1,14 +1,28 @@
 #include "Binary.h"
+
 template<typename T>
-typename Tree<T>::Element* getRoot() {
+Tree<T>::Element::Element(T Data, Element* pLeft, Element* pRight)
+	: Data(Data), pLeft(pLeft), pRight(pRight)
+{
+	cout << "EConstructor: \t" << this << endl;
+}
+
+template<typename T>
+Tree<T>::Element::~Element() {
+	cout << "EDestrcutor: \t" << this << endl;
+}
+
+template<typename T>
+typename Tree<T>::Element* Tree<T>::getRoot() {
 	return Root;
 }
 template<typename T>
-Tree<T>::Tree() {
+Tree<T>::Tree() : Root(nullptr){
 	cout << "TConstructor:\t" << this << endl;
 }
+
 template<typename T>
-Tree<T>::Tree(const std::initializer_list<int>& il) :Tree{
+Tree<T>::Tree(const std::initializer_list<int>& il) :Tree<T>::Tree(){
 	for (T i : il) {
 		Insert(i, Root);
 	}
@@ -31,6 +45,7 @@ void Tree<T>::Print() const {
 	Print(Root);
 	cout << endl << endl;
 }
+
 template<typename T>
 void Tree<T>::Clear() {
 	Clear(Root);
@@ -66,7 +81,7 @@ int Tree<T>::Count()const {
 
 template<typename T>
 double Tree<T>::Avg()const {
-	pAvg++;
+	//pAvg++;
 	cout << "AVG:\t";
 	return Root == nullptr ? 0 : (double)Sum(Root) / Count(Root);
 }
@@ -137,7 +152,7 @@ int Tree<T>::Min(Element* Root)const {
 		return Min(Root->pLeft);
 	}*/
 
-	pMin++;
+	//pMin++;
 	return Root->pLeft == nullptr ? Root->Data : Min(Root->pLeft);
 
 }
@@ -155,7 +170,7 @@ int Tree<T>::Max(Element* Root)const {
 		return Max(Root->pRight);
 	}*/
 
-	pMax++;
+	//pMax++;
 	return Root->pRight == nullptr ? Root->Data : Max(Root->pRight);
 }
 
@@ -188,20 +203,20 @@ int Tree<T>::depth(Element* Root)const {
 	//T r_depth = depth(Root->pRight) + 1;
 	int l_depth = depth(Root->pLeft) + 1;
 	int r_depth = depth(Root->pRight) + 1;
-	pDepth++;
+	//pDepth++;
 
 	return l_depth < r_depth ? r_depth : l_depth;
 }
 
 template<typename T>
 int Tree<T>::Sum(Element* Root, int sum)const {
-	pSum++;
+	//pSum++;
 	return Root == nullptr ? 0 : Sum(Root->pLeft) + Sum(Root->pRight) + Root->Data;
 }
 
 template<typename T>
 int Tree<T>::Count(Element* Root)const {
-	pCount++;
+	//pCount++;
 	return Root == nullptr ? 0 : Count(Root->pLeft) + Count(Root->pRight) + 1;
 }
 
@@ -302,7 +317,7 @@ void Tree<T>::balance(Element* Root) {
 
 
 template<typename T>
-void measure(const Tree& tree, T(Tree::* member_function)()const) {
+void measure(const typename Tree<T>::Tree& tree, T(Tree<T>::* member_function)()const) {
 	clock_t start = clock();
 	T value = (tree.*member_function)();
 	clock_t end = clock();
